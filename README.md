@@ -1,6 +1,6 @@
 # Project 1: Understanding Multimodal Driving data
 ## Mirlan Karimov & Jason Corkill
- Task 1: TODO
+ Task 1: DONE maybe refine
 
  Task 2: TODO
 
