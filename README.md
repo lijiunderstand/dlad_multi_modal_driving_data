@@ -2,7 +2,7 @@
 ## Mirlan Karimov & Jason Corkill
  Task 1: DONE maybe refine
 
- Task 2: TODO warning, havent filtered the points yet
+ Task 2: TODO Finished sematic labeling, still needs 3D bounding boxes
 
  Task 3: TODO
 
