@@ -48,8 +48,8 @@ for key in sem_filtered:
 colors[:,[0,2]] = colors[:,[2,0]] #switch from BGR to RGB
 
 """project points"""
-points_C = T_cam2_velo @ velo_filtered.T # @ is shorthand for np.matmult
-uv_img_cords =  K_cam2 @ points_C[0:3,:] / points_C[2,:]
+points_2 = T_cam2_velo @ velo_filtered.T # @ is shorthand for np.matmult
+uv_img_cords =  K_cam2 @ points_2[0:3,:] / points_2[2,:]
 
 """Scatter plot the points onto the raw Image"""
 plt.imshow(img_cam_2)
@@ -60,7 +60,6 @@ plt.xlim(0,1241)
 
 plt.savefig("Velodyne_Projected.png", dpi= 1000)
 
-plt.show()
 
 """--------------------------
 Do 3D bounding Boxes for Cars
@@ -71,10 +70,10 @@ objects = data["objects"] #this has to be one of the dumbest data structures...
 for obj in objects:
     location3D_0 = obj[11:14] #3d location in frame 0
     obj_size = obj[8:11]
-    rot_y = obj[14]
+    rot_y = obj[14] + np.pi/2
     
     """ find Location of corners """
-    x = obj_size[0]/2
+    x = obj_size[0]/2 + 1
     y = obj_size[1]
     z = obj_size[2]/2
     # !!!! WEIRD ASS COORDINATES FOR CAM 0
@@ -92,9 +91,19 @@ for obj in objects:
     corners_0 = (rot @ corners_car_frame.T).T + location3D_0
     corners_2 = corners_0 + np.array([0.6,0,0]) 
     
-    """ Project corners onto Image """
-    # corners_C = T_cam2_velo @ corners_0.T 
-    #uv_img_cords =  K_cam2 @ points_C[0:3,:] / points_C[2,:]               
+    """ Project corners and lines onto Image """
+    
+    corners_uv2_lambda = P_rect_20 @ np.concatenate((corners_2 , np.ones((8,1))), axis =1).T 
+    corners_uv2 = corners_uv2_lambda / corners_uv2_lambda[2,:]
+    plt.scatter(corners_uv2[0,:], corners_uv2[1,:], s=2)
+    #plt.plot(corners_uv2[0,:], corners_uv2[1,:] , linewidth=0.5)
+    #plt.plot(corners_uv2[0,1:3], corners_uv2[1,1:3])
+    #plt.plot(corners_uv2[0,2:4], corners_uv2[1,2:4])
+    #plt.plot(corners_uv2[0,2:4], corners_uv2[1,2:4])
+    
+    
+plt.savefig("Velodyne_Projected_3DBox.png", dpi= 1000)
+plt.show()              
             
     
 
