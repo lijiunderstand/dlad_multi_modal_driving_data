@@ -58,6 +58,43 @@ plt.scatter(uv_img_cords[0,:], uv_img_cords[1,:], s = 1, marker = '.' \
 plt.ylim(376,0)
 plt.xlim(0,1241) 
 
-plt.savefig("Velodyne_Projected.png", dpi= 2000)
+plt.savefig("Velodyne_Projected.png", dpi= 1000)
 
 plt.show()
+
+"""--------------------------
+Do 3D bounding Boxes for Cars
+--------------------------"""
+
+objects = data["objects"] #this has to be one of the dumbest data structures...
+
+for obj in objects:
+    location3D_0 = obj[11:14] #3d location in frame 0
+    obj_size = obj[8:11]
+    rot_y = obj[14]
+    
+    """ find Location of corners """
+    x = obj_size[0]/2
+    y = obj_size[1]
+    z = obj_size[2]/2
+    # !!!! WEIRD ASS COORDINATES FOR CAM 0
+    corners_car_frame = np.array([[x, -y, z],
+                                  [-x, -y, z],
+                                  [-x, -y, -z],
+                                  [x, -y, -z],
+                                  [-x, 0, z],
+                                  [x, 0, z],
+                                  [-x, 0, -z],
+                                  [x, 0, -z]])
+    rot = np.array([[np.cos(rot_y), 0, np.sin(rot_y)],
+                    [0, 1, 0], 
+                    [-np.sin(rot_y), 0, np.cos(rot_y)]])
+    corners_0 = (rot @ corners_car_frame.T).T + location3D_0
+    corners_2 = corners_0 + np.array([0.6,0,0]) 
+    
+    """ Project corners onto Image """
+    # corners_C = T_cam2_velo @ corners_0.T 
+    #uv_img_cords =  K_cam2 @ points_C[0:3,:] / points_C[2,:]               
+            
+    
+

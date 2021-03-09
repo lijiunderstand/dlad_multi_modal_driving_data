@@ -2,7 +2,7 @@
 ## Mirlan Karimov & Jason Corkill
  Task 1: DONE maybe refine
 
- Task 2: TODO Finished sematic labeling, still needs 3D bounding boxes
+ Task 2: TODO Bounding boxes almost done, need to project corners
 
  Task 3: TODO
 
