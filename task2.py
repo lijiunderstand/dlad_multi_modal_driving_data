@@ -58,8 +58,8 @@ plt.scatter(uv_img_cords[0,:], uv_img_cords[1,:], s = 1, marker = '.' \
 plt.ylim(376,0)
 plt.xlim(0,1241) 
 
-plt.savefig("Velodyne_Projected.png", dpi= 1000)
-plt.show() 
+plt.savefig("Velodyne_Projected.png", dpi= 2000)
+ 
 
 """--------------------------
 Do 3D bounding Boxes for Cars
@@ -91,7 +91,7 @@ for obj in objects:
     corners_0 = (rot @ corners_car_frame.T).T + location3D_0
     corners_2 = corners_0 
     
-    """ Project corners and lines onto Image """
+    """ Project corners and lines onto Image (with some nice boilerplate code) """
     color_box = np.array(list(np.random.choice(range(256), size=3))) /255.0
     corners_uv2_lambda = P_rect_20 @ np.concatenate((corners_2 , np.ones((8,1))), axis =1).T 
     corners_uv2 = corners_uv2_lambda / corners_uv2_lambda[2,:]
@@ -105,10 +105,8 @@ for obj in objects:
     plt.plot(corners_uv2[0,[2,6]], corners_uv2[1,[2,6]] , linewidth=0.5, color = color_box)
     plt.plot(corners_uv2[0,[3,7]], corners_uv2[1,[3,7]] , linewidth=0.5, color = color_box)
     
-    
-    
-    
-plt.savefig("Velodyne_Projected_3DBox.png", dpi= 1000)
+
+plt.savefig("Velodyne_Projected_3DBox.png", dpi= 2000)
 plt.show()              
             
     
