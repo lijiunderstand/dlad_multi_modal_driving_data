@@ -8,5 +8,5 @@ import os
 from load_data import load_data
 
 data_path = os.path.join('data','data.p')
-print(data_path)
-data= load_data(data_path) 
+data = load_data(data_path) 
+
