@@ -2,7 +2,7 @@
 """
 Created on Fri Mar  5 14:09:24 2021
 
-@author: Jason
+@author: Jason and Mirlan
 """
 import cv2
 import numpy as np
@@ -32,4 +32,3 @@ img_birdseye_90 = cv2.rotate(img_birdseye, cv2.ROTATE_90_COUNTERCLOCKWISE)
 cv2.imshow('Birdseye_View', img_birdseye_90)
 cv2.waitKey(10000)
 cv2.destroyAllWindows()
-#cv2.imwrite('messigray.png',img)
