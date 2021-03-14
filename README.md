@@ -4,7 +4,7 @@
 
  Task 2: DONE
 
- Task 3: TODO
+ Task 3: DONE
 
  Task 4: TODO
 
