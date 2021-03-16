@@ -110,7 +110,7 @@ def print_projection_plt(points, color, image):
     """ project converted velodyne points into camera image """
 
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    print(points.shape[1])
+    
     for i in range(points.shape[1]):
        
         cv2.circle(hsv_image, (np.int32(points[0][i]), np.int32(points[1][i])), 2, (int(color[i]), 255, 255), -1)
