@@ -23,6 +23,7 @@ def project_points(velopoints, image):
     points_filtered_r = np.sqrt(points_filtered[:,0]**2 + points_filtered[:,1]**2 + points_filtered[:,2]**2)
     
     points_colors = du.depth_color(points_filtered_r)
+    points_colors = points_colors * (127.5/np.max(points_colors))
     
     '''project velopoints onto image plane'''
     points_cam0 = R_velo2cam @ points_filtered.T + t_velo2cam  
@@ -49,19 +50,7 @@ for ind in range(test_frame,test_frame+1): #replace with range(430) when done te
     velo_velocity = R_imu2velo @ oxts_velocity  #can i do this? with ang rate independent?
     velo_angular_rate = R_imu2velo @ oxts_angular_rate
     
-    # '''show unrectified points'''
-    # velodyne_dist = velodyne_points[velodyne_points[:,0]>0]
-    # velodyne_dist_r = np.sqrt(velodyne_dist[:,0]**2 + velodyne_dist[:,1]**2 + velodyne_dist[:,2]**2)
-    
-    # velodyne_dist_colors = du.depth_color(velodyne_dist_r)
-    
-    # '''project velopoints onto image plane'''
-    # velodyne_dist_cam0 = R_velo2cam @ velodyne_dist.T + t_velo2cam  
-    # velodyne_dist_uv_lambda = cam0tocam2[:,:3] @ velodyne_dist_cam0
-    # velodyne_dist_uv = velodyne_dist_uv_lambda / velodyne_dist_uv_lambda[2,:]
-    
-    # img_before = du.print_projection_plt(velodyne_dist_uv, velodyne_dist_colors, img2)
-    
+    '''project points for befor picture'''
     img_before = project_points(velodyne_points, img2)
     
     cv2.imshow("Before Correction",img_before)
@@ -75,14 +64,18 @@ for ind in range(test_frame,test_frame+1): #replace with range(430) when done te
     velodyne_point_phi = np.arctan2(velodyne_points[:,1], velodyne_points[:,0])
     for p in range(velodyne_points.shape[0]):
         phi = velodyne_point_phi[p]
-        if (version == 1):
-            time_revolution = (time_velo_end - time_velo_start)
+        # if (version == 1):
+        #     time_revolution = (time_velo_end - time_velo_start)
 
-        else:
-            time_revolution = 1/f_velodyne
+        # else:
+        #     time_revolution = 1/f_velodyne
         
-        dt_since_start = time_revolution * (phi/(2*np.pi)) #!!!! THE BUG IS HERE, this assumes that we started with the velo facing forward, that is wrong, need to figure out where we are by sorting
-        dt_camtrigger_to_pointrecorded = -(time_velo - time_velo_start - dt_since_start)
+        phi_vel_start = -(f_velodyne*(2*np.pi))*(time_velo - time_velo_start) #angle when the velodyne starts recording
+        dt_since_start = (phi - phi_vel_start)/(f_velodyne*(2*np.pi)) #time it took velodyne to reach current point from start
+        
+        
+        #dt_since_start = time_revolution * (phi/(2*np.pi)) #!!!! THE BUG IS HERE, this assumes that we started with the velo facing forward, that is wrong, need to figure out where we are by sorting
+        dt_camtrigger_to_pointrecorded = (time_velo - time_velo_start - dt_since_start)
         '''ok ill just ignore the angular velocity for a sec'''
         omega = velo_angular_rate[2] * dt_camtrigger_to_pointrecorded
         R_z = np.array([[np.cos(omega), -np.sin(omega), 0],
@@ -94,6 +87,7 @@ for ind in range(test_frame,test_frame+1): #replace with range(430) when done te
     img_after = project_points(velodyne_points, img2) 
     cv2.imshow("After Correction",img_after)
     cv2.waitKey(3000)
+    cv2.imwrite('After_correction.png', img_after)
     cv2.destroyAllWindows()
         
         
