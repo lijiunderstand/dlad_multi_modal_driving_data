@@ -8,7 +8,8 @@ import data_utils as du
 import cv2
 import numpy as np
 
-ONLY_DO_TEST_FRAME = True; #Switch between test frame and all frames
+'''Switch between test frame and all frames, for all frames you need a 'Result' folder for it to run properly'''
+ONLY_DO_TEST_FRAME = True; 
  
 f_velodyne = 10
 test_frame = 37
