@@ -8,11 +8,17 @@ import data_utils as du
 import cv2
 import numpy as np
 
-version = 1 #there are two version to implement 
+ONLY_DO_TEST_FRAME = True; #Switch between test frame and all frames
+ 
 f_velodyne = 10
 test_frame = 37
 [R_velo2cam, t_velo2cam] = du.calib_velo2cam("data/problem_4/calib_velo_to_cam.txt")
 cam0tocam2 = du.calib_cam2cam("data/problem_4/calib_cam_to_cam.txt", '02')
+
+if ONLY_DO_TEST_FRAME:
+    range_use = range(test_frame,test_frame+1)
+else:
+    range_use = range(430)
 
 '''they dont give us a function to get R and t imu2velo for some reason -> velo2cam should work though'''
 [R_imu2velo, t_imu2velo] = du.calib_velo2cam("data/problem_4/calib_imu_to_velo.txt")
@@ -31,8 +37,7 @@ def project_points(velopoints, image):
     points_uv = points_uv_lambda / points_uv_lambda[2,:]
     return du.print_projection_plt(points_uv, points_colors, image) 
     
-
-for ind in range(test_frame,test_frame+1): #replace with range(430) when done testing
+for ind in range_use: 
     
     '''import all timestamps for this frame'''
     time_img2 = du.compute_timestamps("data/problem_4/image_02/timestamps.txt", ind)
@@ -52,23 +57,13 @@ for ind in range(test_frame,test_frame+1): #replace with range(430) when done te
     
     '''project points for befor picture'''
     img_before = project_points(velodyne_points, img2)
-    
-    cv2.imshow("Before Correction",img_before)
-    cv2.waitKey(1000)
-    cv2.destroyAllWindows()
-    
+      
     '''rectify the velodyne points
     Idea: for every slice of phi in the velo points we need to calculate when 
     it happend and then figure out what the R and t for those points are to transform them to the right point'''
-    #velodyne_points_r = np.sqrt(velodyne_points[:,0]**2 + velodyne_points[:,1]**2 + velodyne_points[:,2]**2)
     velodyne_point_phi = np.arctan2(velodyne_points[:,1], velodyne_points[:,0])
     for p in range(velodyne_points.shape[0]):
         phi = velodyne_point_phi[p]
-        # if (version == 1):
-        #     time_revolution = (time_velo_end - time_velo_start)
-
-        # else:
-        #     time_revolution = 1/f_velodyne
         
         phi_vel_start = -(f_velodyne*(2*np.pi))*(time_velo - time_velo_start) #angle when the velodyne starts recording
         dt_since_start = (phi - phi_vel_start)/(f_velodyne*(2*np.pi)) #time it took velodyne to reach current point from start
@@ -83,11 +78,21 @@ for ind in range(test_frame,test_frame+1): #replace with range(430) when done te
                         [0,             0,             1]])
         point_rectified = R_z @ velodyne_points[p,:] + dt_camtrigger_to_pointrecorded * velo_velocity
         velodyne_points[p,:] = point_rectified
-            
+    
     img_after = project_points(velodyne_points, img2) 
-    cv2.imshow("After Correction",img_after)
-    cv2.waitKey(3000)
-    cv2.imwrite('After_correction.png', img_after)
-    cv2.destroyAllWindows()
+    if ONLY_DO_TEST_FRAME:
+        
+        cv2.imwrite('Before_Correction_%010d.png' %ind, img_before)
+        cv2.imshow("Before Correction",img_before)
+        cv2.waitKey(2000)
+        cv2.destroyAllWindows()
+        
+        cv2.imwrite('After_Correction_%010d.png' %ind, img_after)
+        cv2.imshow("After Correction",img_after)
+        cv2.waitKey(2000) 
+        cv2.destroyAllWindows()
+    else:
+        cv2.imwrite('Result/After_correction_%010d.png' %ind, img_after)
+    
         
         

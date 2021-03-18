@@ -26,9 +26,10 @@ for point in range(len(velodyne)):
     
     refl_curr = img_birdseye[x,y]
     if refl_curr < refl:
-        img_birdseye[x,y] =  refl
+        img_birdseye[x,y] =  refl 
         
 img_birdseye_90 = cv2.rotate(img_birdseye, cv2.ROTATE_90_COUNTERCLOCKWISE)
+cv2.imwrite('Birdseye_View.png', img_birdseye_90  * (255.0))
 cv2.imshow('Birdseye_View', img_birdseye_90)
 cv2.waitKey(10000)
 cv2.destroyAllWindows()

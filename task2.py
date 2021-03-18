@@ -9,16 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data import data
 
-
-
-
 """load in Image 2"""
 
 img_cam_2 = data["image_2"]
-#cv2.imshow('Image_2',np.array(img_cam_2, dtype=np.uint8)) #colors are still off
-#cv2.waitKey(1000)
-#cv2.destroyAllWindows()
-#cv2.imwrite('img_cam_2_raw.png',img_cam_2)
 
 """-----------------------------------
 project 3D points on to Image Plane
@@ -60,7 +53,7 @@ plt.scatter(uv_img_cords[0,:], uv_img_cords[1,:], s = 1, marker = '.' \
 plt.ylim(376,0)
 plt.xlim(0,1241)
 
-plt.savefig("Velodyne_Projected.png", dpi= 1000)
+plt.savefig("Velodyne_Projected.png", dpi= 2000)
 
 
 """--------------------------
@@ -108,5 +101,5 @@ for obj in objects:
     plt.plot(corners_uv2[0,[3,7]], corners_uv2[1,[3,7]] , linewidth=0.5, color = color_box)
 
 
-plt.savefig("Velodyne_Projected_3DBox.png", dpi= 1000)
+plt.savefig("Velodyne_Projected_3DBox.png", dpi= 2000)
 plt.show()
