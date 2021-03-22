@@ -65,7 +65,7 @@ class Visualizer():
                               color=[0,1,0,1])
 
 if __name__ == '__main__':
-    data = load_data('data/demo.p') # Change to data.p for your final submission 
+    data = load_data('data/data.p') # Change to data.p for your final submission 
     visualizer = Visualizer()
     color_map = data["color_map"]
     sem_label = data["sem_label"]
