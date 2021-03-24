@@ -13,11 +13,13 @@ ONLY_DO_TEST_FRAME = True;
  
 f_velodyne = 10
 test_frame = 37
+
 [R_velo2cam, t_velo2cam] = du.calib_velo2cam("data/problem_4/calib_velo_to_cam.txt")
 cam0tocam2 = du.calib_cam2cam("data/problem_4/calib_cam_to_cam.txt", '02')
 
+
 if ONLY_DO_TEST_FRAME:
-    range_use = range(test_frame,test_frame+1)
+    range_use = [test_frame]#[test_frame,44,312,428]#range(test_frame,test_frame+1)
 else:
     range_use = range(430)
 
@@ -63,16 +65,22 @@ for ind in range_use:
     Idea: for every slice of phi in the velo points we need to calculate when 
     it happend and then figure out what the R and t for those points are to transform them to the right point'''
     velodyne_point_phi = np.arctan2(velodyne_points[:,1], velodyne_points[:,0])
+    f_velodyne = 1/(time_velo_end - time_velo_start)
     for p in range(velodyne_points.shape[0]):
         phi = velodyne_point_phi[p]
         
-        phi_vel_start = -(f_velodyne*(2*np.pi))*(time_velo - time_velo_start) #angle when the velodyne starts recording
-        dt_since_start = (phi - phi_vel_start)/(f_velodyne*(2*np.pi)) #time it took velodyne to reach current point from start
+        #phi_vel_start = -(f_velodyne*(2*np.pi))*(time_img2 - time_velo_start) #angle when the velodyne starts recording
+        #dt_since_start = (phi - phi_vel_start)/(f_velodyne*(2*np.pi)) #time it took velodyne to reach current point from start
         
         
         #dt_since_start = time_revolution * (phi/(2*np.pi)) #!!!! THE BUG IS HERE, this assumes that we started with the velo facing forward, that is wrong, need to figure out where we are by sorting
-        dt_camtrigger_to_pointrecorded = (time_velo - time_velo_start - dt_since_start)
-        '''ok ill just ignore the angular velocity for a sec'''
+        #dt_camtrigger_to_pointrecorded = (time_img2 - time_velo_start - dt_since_start)
+        phi_vel_start = (f_velodyne*(2*np.pi))*(time_velo - time_velo_start)
+        if (phi_vel_start <= np.pi/2 or phi_vel_start >= (3/2) *np.pi):
+            print('assumption doesnt hold')
+            
+        dt_camtrigger_to_pointrecorded = -(phi / (f_velodyne*(2*np.pi))) # - (time_img2 - time_velo)
+        
         omega = velo_angular_rate[2] * dt_camtrigger_to_pointrecorded
         R_z = np.array([[np.cos(omega), -np.sin(omega), 0],
                         [np.sin(omega), np.cos(omega), 0],
